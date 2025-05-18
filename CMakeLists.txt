@@ -35,12 +35,13 @@ install(TARGETS bulk RUNTIME DESTINATION bin)
 # Настройки CPack
 set(CPACK_GENERATOR "DEB") 
 set(CPACK_PACKAGE_NAME "bulk")
-set(CPACK_PACKAGE_FILE_NAME "bulk.deb")  
+set(CPACK_PACKAGE_FILE_NAME "bulk")  
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "t.o.nikolaeva@gmail.com")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Bulk command processor")
 
-# Для DEB пакетов (если нужно)
-set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")  # Использует только имя без версии
+# Отключаем ненужные генераторы
+set(CPACK_SOURCE_GENERATOR "")  # Отключаем генерацию исходников
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY FALSE)
 
 include(CPack)
 
