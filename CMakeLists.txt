@@ -33,8 +33,9 @@ endforeach()
 install(TARGETS bulk RUNTIME DESTINATION bin)
 
 # Настройки CPack
+set(CPACK_GENERATOR "DEB") 
 set(CPACK_PACKAGE_NAME "bulk")
-set(CPACK_PACKAGE_FILE_NAME "bulk")  
+set(CPACK_PACKAGE_FILE_NAME "bulk.deb")  
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_VENDOR "TK")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Bulk command processor")
