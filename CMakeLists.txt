@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 3.5)
 
-project(bulk )
+project(bulk VERSION 0.1.1) 
 
 add_executable(bulk 
 	main.cpp
@@ -32,7 +32,15 @@ endforeach()
 
 install(TARGETS bulk RUNTIME DESTINATION bin)
 
-set(CPACK_GENERATOR DEB)
-set(CPACK_PACKAGE_CONTACT example@example.com)
+# Настройки CPack
+set(CPACK_PACKAGE_NAME "bulk")
+set(CPACK_PACKAGE_FILE_NAME "bulk")  
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_VENDOR "TK")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Bulk command processor")
+
+# Для DEB пакетов (если нужно)
+set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")  # Использует только имя без версии
+
 include(CPack)
 
