@@ -1,5 +1,5 @@
-#include "command_processor.h"
 #include "generate_tests.h"
+#include "command_processor.h"
 
 // for generating test data
 #include <chrono>

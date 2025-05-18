@@ -3,7 +3,12 @@ cmake_minimum_required(VERSION 3.5)
 
 project(bulk )
 
-add_executable(bulk main.cpp )
+add_executable(bulk 
+	main.cpp
+	command_processor.cpp
+    	command_processor.h
+	generate_tests.h
+	generate_tests.cpp )
 
 set (ALL_SOURCES bulk)
 
