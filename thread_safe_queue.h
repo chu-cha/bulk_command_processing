@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include <queue>
 #include <mutex>
 #include <condition_variable>

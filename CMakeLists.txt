@@ -22,7 +22,7 @@ set_target_properties(${ALL_SOURCES} PROPERTIES
 foreach(s ${ALL_SOURCES})
 	if (MSVC)
 		target_compile_options(${s} PRIVATE
-			/W4
+			/W3
 		)
 		
 	else ()
