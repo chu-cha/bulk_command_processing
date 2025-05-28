@@ -5,6 +5,24 @@
 #include <sstream>
 
 
+CommandProcessor::CommandProcessor(size_t b_size)
+    : bulk_size(b_size) {
+    // Start worker threads
+    log_thread_ = std::thread(&CommandProcessor::log_worker, this);
+    file_thread1_ = std::thread(&CommandProcessor::file_worker, this, 1);
+    file_thread2_ = std::thread(&CommandProcessor::file_worker, this, 2);
+}
+CommandProcessor::~CommandProcessor() {
+    // Signal threads to stop
+    log_queue_.stop();
+    file_queue_.stop();
+
+    // Wait for threads to finish
+    if (log_thread_.joinable()) log_thread_.join();
+    if (file_thread1_.joinable()) file_thread1_.join();
+    if (file_thread2_.joinable()) file_thread2_.join();
+}
+
 void CommandProcessor::process(const std::string& command) {
     if (command == "{") {
         handle_block_start();
@@ -66,42 +84,57 @@ bool CommandProcessor::should_flush() const {
 
 void CommandProcessor::flush(bool force) {
 
-    if (!force)
-        print_buffer();
+    if (!force && !buffer.empty()) {
+        // Send to log thread
+        log_queue_.push(buffer);
+
+        // Send to file threads
+        file_queue_.push(buffer);
+    }
+
     clear_state();
 }
 
-void CommandProcessor::print_buffer_impl(std::ostream& output_stream) const
+void CommandProcessor::log_worker() {
+    std::vector<std::string> commands;
+    while (log_queue_.pop(commands)) {
+        print_buffer_impl(std::cout, commands);
+    }
+}
+
+void CommandProcessor::file_worker(int worker_id) {
+    std::vector<std::string> commands;
+    while (file_queue_.pop(commands)) {
+        auto filename = generate_filename(worker_id);
+        std::ofstream logfile(filename);
+        print_buffer_impl(logfile, commands);
+    }
+}
+
+std::string CommandProcessor::generate_filename(int worker_id) const {
+    auto now = std::chrono::system_clock::now();
+    auto timestamp = std::chrono::system_clock::to_time_t(now);
+
+    // Get milliseconds for more precise timing
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+        now.time_since_epoch()) % 1000;
+
+    std::ostringstream oss;
+    oss << "bulk" << timestamp << "_" << ms.count() << "_" << worker_id << ".log";
+    return oss.str();
+}
+
+void CommandProcessor::print_buffer_impl(std::ostream& output_stream, const  std::vector<std::string>& commands) const
 {
-    auto sz = buffer.size();
+    auto sz = commands.size();
 
     output_stream << "bulk: ";
     for (auto i = 0; i < sz; i++) {
-        output_stream << buffer[i] << (i < sz - 1 ? ", " : "");
+        output_stream << commands[i] << (i < sz - 1 ? ", " : "");
     }
     output_stream << '\n';
 }
 
-void CommandProcessor::print_buffer() const {
-
-    auto sz = buffer.size();
-
-    if (!sz)
-        return;
-
-    print_buffer_impl(std::cout);
-
-    auto generate_filename = []() {
-        auto now = std::chrono::system_clock::now();
-        auto timestamp = std::chrono::system_clock::to_time_t(now);
-        std::ostringstream oss;
-        oss << "bulk" << timestamp << ".log";
-        return oss.str();
-        };
-
-    std::ofstream logfile(generate_filename());
-    print_buffer_impl(logfile);
-}
 
 void CommandProcessor::clear_state() {
     buffer.clear();

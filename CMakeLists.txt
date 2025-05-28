@@ -8,7 +8,9 @@ add_executable(bulk
 	command_processor.cpp
     	command_processor.h
 	generate_tests.h
-	generate_tests.cpp )
+	generate_tests.cpp
+	thread_safe_queue.h
+	thread_safe_queue.cpp )
 
 set (ALL_SOURCES bulk)
 

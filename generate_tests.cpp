@@ -13,7 +13,7 @@ void generateTestFile(const std::string& filename) {
     int open_braces = 0;
     int command_count = 0;
 
-    while (command_count < 30 || open_braces > 0) {
+    while (command_count < 100 || open_braces > 0) {
         int action = special_dist(gen);
         std::string next_token;
 

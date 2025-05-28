@@ -21,13 +21,13 @@ int main(int argc, char* argv[]) {
 
     //// for testing purposes:
     //// 1. Generate txt file with commands
-    //const std::string input_file = "commands.txt";
+    const std::string input_file = "commands.txt";
     //generateTestFile(input_file);
 
-    //// for testing purposes :
-    //// 2. stream input from file
-    //std::ifstream in(input_file);
-    //std::cin.rdbuf(in.rdbuf());
+    // for testing purposes :
+    // 2. stream input from file
+    std::ifstream in(input_file);
+    std::cin.rdbuf(in.rdbuf());
 
     // 3. process comands (with delay)
     auto block_size = std::stoi(argv[1]);
