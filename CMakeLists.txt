@@ -63,7 +63,14 @@ install(TARGETS bulk RUNTIME DESTINATION bin)
 install(FILES ${ASYNC_HEADERS} DESTINATION include/async)
 
 # Настройки CPack
-set(CPACK_GENERATOR "DEB")
+set(CPACK_GENERATOR "DEB") 
 set(CPACK_PACKAGE_NAME "bulk")
+set(CPACK_PACKAGE_FILE_NAME "bulk")  
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "t.o.nikolaeva@gmail.com")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Bulk command processor")
+
+# Отключаем ненужные генераторы
+set(CPACK_SOURCE_GENERATOR "")  # Отключаем генерацию исходников
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY FALSE)
+
 include(CPack)
