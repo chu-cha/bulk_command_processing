@@ -6,34 +6,60 @@
 #include <thread>
 #include <fstream>
 
-void processCommands(CommandProcessor& processor) {
-    std::string command;
-    while (std::getline(std::cin, command)) {
+#include "async.h"
+#include <iostream>
+#include <vector>
 
-        processor.process(command); 
-
-        // for testing purposes: emulates output 1 cmd per second
-        //std::this_thread::sleep_for(std::chrono::seconds(1));
+void client_task(std::shared_ptr<async::Handle> handle, const std::vector<std::string>& commands) {
+    for (const auto& cmd : commands) {
+        handle->receive(cmd.c_str(), cmd.size());
     }
 }
 
-int main(int argc, char* argv[]) {
+std::vector<std::string> readCommandsFromFile(const std::string& filename) {
+    std::vector<std::string> commands;
+    std::ifstream file(filename);
 
-    //// for testing purposes:
-    //// 1. Generate txt file with commands
-    const std::string input_file = "commands.txt";
-    //generateTestFile(input_file);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
 
-    // for testing purposes :
-    // 2. stream input from file
-    std::ifstream in(input_file);
-    std::cin.rdbuf(in.rdbuf());
+    std::string line;
+    while (std::getline(file, line)) {
+        if (!line.empty()) {  
+            commands.push_back(line);
+        }
+    }
 
-    // 3. process comands (with delay)
-    auto block_size = std::stoi(argv[1]);
+    return commands;
+}
 
-    CommandProcessor processor(block_size);
-    processCommands(processor);
+int main() {
+    // create 2 processing contexts with bulk_size 3 and 2
+    auto handle1 = async::connect(3);
+    auto handle2 = async::connect(2);
+
+    const std::string input_file1 = "commands1.txt";
+    generateTestFile(input_file1, "cmd_");
+
+    const std::string input_file2 = "commands2.txt";
+    generateTestFile(input_file2, "prc_"); //prc_ and cmd_ to visually distinguish threads
+
+    // Data for processing
+    std::vector<std::string> data1 = readCommandsFromFile(input_file1);
+    std::vector<std::string> data2 = readCommandsFromFile(input_file2);
+
+    //client_task(handle1, data1);
+    //client_task(handle2, data2);
+
+    // Processing in 2 threads
+    std::thread t1([&]() { client_task(handle1, data1); });
+    std::thread t2([&]() { client_task(handle2, data2); });
+
+    t1.join();
+    t2.join();
+
+    // Dtors of handle1 and handle2 will automatically call disconnect()
 
     return 0;
 }

@@ -3,7 +3,7 @@
 #include <random>
 #include <fstream>
 
-void generateTestFile(const std::string& filename) {
+void generateTestFile(const std::string& filename, std::string cmd_prefix) {
     std::ofstream out(filename);
 
     std::random_device rd;
@@ -18,7 +18,7 @@ void generateTestFile(const std::string& filename) {
         std::string next_token;
 
         if (action < 14) {
-            next_token = "cmd_" + std::to_string(command_count);
+            next_token = cmd_prefix + std::to_string(command_count);
             command_count++;
         }
         else if (action == 14) {
