@@ -43,7 +43,7 @@ set_target_properties(async PROPERTIES
 )
 
 # Исполняемый файл
-add_executable(bulk main.cpp)
+add_executable(bulk main.cpp generate_tests.h generate_tests.cpp)
 set_target_properties(bulk PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
